@@ -1,789 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIEM Security Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .neon-border {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .heatmap-cell {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .heatmap-cell:hover {
-            transform: scale(1.1);
-            z-index: 10;
-        }
-        
-        .attack-node {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .attack-node:hover {
-            transform: scale(1.2);
-        }
-        
-        .permission-matrix-cell {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .permission-matrix-cell:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .gauge-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-        }
-        
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrossIdentity CIEM Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+    * {
+      font-family: "Inter", sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 1rem;
+      border: 1px solid #f97316;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    .neon-border {
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ea580c;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <!-- Header -->
-    <header class="glass-card p-6 mb-8">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    <i class="fas fa-shield-alt mr-3"></i>CIEM Security Dashboard
-                </h1>
-                <p class="text-gray-400 mt-2">Cloud Infrastructure Entitlement Management</p>
-            </div>
-            <div class="flex space-x-4">
-                <select class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white">
-                    <option>All Cloud Providers</option>
-                    <option>AWS</option>
-                    <option>Azure</option>
-                    <option>GCP</option>
-                </select>
-                <select class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white">
-                    <option>All Business Units</option>
-                    <option>Engineering</option>
-                    <option>Marketing</option>
-                    <option>Finance</option>
-                </select>
-                <select class="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white">
-                    <option>All Risk Levels</option>
-                    <option>Critical</option>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
-                </select>
-            </div>
-        </div>
-    </header>
+<body class="bg-white text-orange-700 min-h-screen">
+  <!-- Header -->
+  <header class="glass-card p-6 mb-8">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-orange-600">
+          <i class="fas fa-shield-alt mr-3"></i>CrossIdentity CIEM Dashboard
+        </h1>
+        <p class="text-orange-400 mt-2">
+          Cloud Infrastructure Entitlement Management
+        </p>
+      </div>
+      <img
+        src="logo_ca09943fc0e49ec47161767dd7915e3c_2x.png"
+        alt="CrossIdentity Logo"
+        class="h-12"
+      />
+    </div>
+  </header>
 
-    <div class="container mx-auto px-6 space-y-8">
-        <!-- Section 5: Compliance Summary Cards (moved to top for overview) -->
-        <section class="grid grid-cols-1 md:grid-cols-5 gap-6">
-            <div class="glass-card neon-border rounded-xl p-6 text-center">
-                <div class="text-red-400 text-3xl mb-2">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="text-2xl font-bold text-red-400">247</div>
-                <div class="text-sm text-gray-400">Overprivileged Identities</div>
-            </div>
-            
-            <div class="glass-card neon-border rounded-xl p-6 text-center">
-                <div class="text-yellow-400 text-3xl mb-2">
-                    <i class="fas fa-user-slash"></i>
-                </div>
-                <div class="text-2xl font-bold text-yellow-400">89</div>
-                <div class="text-sm text-gray-400">Orphaned Accounts</div>
-            </div>
-            
-            <div class="glass-card neon-border rounded-xl p-6 text-center">
-                <div class="text-blue-400 text-3xl mb-2">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="text-2xl font-bold text-blue-400">1,847</div>
-                <div class="text-sm text-gray-400">Total Cloud Identities</div>
-            </div>
-            
-            <div class="glass-card neon-border rounded-xl p-6 text-center">
-                <div class="text-green-400 text-3xl mb-2">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="text-2xl font-bold text-green-400">156/203</div>
-                <div class="text-sm text-gray-400">Access Reviews</div>
-            </div>
-            
-            <div class="glass-card neon-border rounded-xl p-6 text-center">
-                <div class="text-purple-400 text-3xl mb-2">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="text-2xl font-bold text-purple-400">42</div>
-                <div class="text-sm text-gray-400">Auto Deprovisioning</div>
-            </div>
-        </section>
-
-        <!-- Section 1: User-Resource-Permission Mapping -->
-        <section class="glass-card rounded-xl p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-blue-400">
-                    <i class="fas fa-project-diagram mr-3"></i>User-Resource-Permission Mapping
-                </h2>
-                <div class="flex space-x-3">
-                    <select class="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm">
-                        <option>All Identity Types</option>
-                        <option>Human</option>
-                        <option>Non-Human</option>
-                    </select>
-                    <select class="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm">
-                        <option>All Cloud Providers</option>
-                        <option>AWS</option>
-                        <option>Azure</option>
-                        <option>GCP</option>
-                    </select>
-                    <select class="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm">
-                        <option>All Risk Levels</option>
-                        <option>Critical</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto scrollbar-hide">
-                <table class="w-full min-w-max">
-                    <thead>
-                        <tr class="border-b border-gray-700">
-                            <th class="text-left p-3 font-semibold text-blue-400">Identity ID</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Username</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Identity Type</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Cloud Type</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Last Active</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Risk Score</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Resources Accessed</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Permissions</th>
-                            <th class="text-left p-3 font-semibold text-blue-400">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for john.doe@company.com">
-                            <td class="p-3 text-sm font-mono text-gray-300">USR-001</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user text-blue-400 mr-2"></i>
-                                    john.doe@company.com
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-blue-600 text-blue-100 rounded-full text-xs">Human</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-orange-600 text-orange-100 rounded-full text-xs">AWS</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-15 14:32</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                                    <span class="text-red-400 font-bold">8.5</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-yellow-400 font-semibold">47</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-red-400 font-semibold">156</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for service-account-api">
-                            <td class="p-3 text-sm font-mono text-gray-300">SVC-002</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-cog text-purple-400 mr-2"></i>
-                                    service-account-api
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-purple-600 text-purple-100 rounded-full text-xs">Service Account</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-orange-600 text-orange-100 rounded-full text-xs">AWS</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-15 16:45</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-                                    <span class="text-yellow-400 font-bold">6.2</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-yellow-400 font-semibold">23</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-yellow-400 font-semibold">89</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for admin@company.com">
-                            <td class="p-3 text-sm font-mono text-gray-300">USR-003</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user-shield text-red-400 mr-2"></i>
-                                    admin@company.com
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-blue-600 text-blue-100 rounded-full text-xs">Human</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-orange-600 text-orange-100 rounded-full text-xs">AWS</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-15 09:15</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                                    <span class="text-red-400 font-bold">9.8</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-red-400 font-semibold">127</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-red-400 font-semibold">342</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for azure-vm-service">
-                            <td class="p-3 text-sm font-mono text-gray-300">SVC-004</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-server text-purple-400 mr-2"></i>
-                                    azure-vm-service
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-purple-600 text-purple-100 rounded-full text-xs">Managed Identity</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-blue-600 text-blue-100 rounded-full text-xs">Azure</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-15 12:08</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                                    <span class="text-green-400 font-bold">3.1</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-green-400 font-semibold">12</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-green-400 font-semibold">34</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for gcp-compute-sa">
-                            <td class="p-3 text-sm font-mono text-gray-300">SVC-005</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-cloud text-purple-400 mr-2"></i>
-                                    gcp-compute-sa@project.iam
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-purple-600 text-purple-100 rounded-full text-xs">Service Account</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-red-600 text-red-100 rounded-full text-xs">GCP</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-15 11:22</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-                                    <span class="text-yellow-400 font-bold">5.7</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-yellow-400 font-semibold">31</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-yellow-400 font-semibold">78</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 cursor-pointer permission-matrix-cell" data-tooltip="Click to view detailed permissions for sarah.wilson@company.com">
-                            <td class="p-3 text-sm font-mono text-gray-300">USR-006</td>
-                            <td class="p-3 text-sm">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user text-blue-400 mr-2"></i>
-                                    sarah.wilson@company.com
-                                </div>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-blue-600 text-blue-100 rounded-full text-xs">Human</span>
-                            </td>
-                            <td class="p-3">
-                                <span class="px-2 py-1 bg-blue-600 text-blue-100 rounded-full text-xs">Azure</span>
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">2024-01-14 17:30</td>
-                            <td class="p-3">
-                                <div class="flex items-center">
-                                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                                    <span class="text-green-400 font-bold">2.8</span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-green-400 font-semibold">8</span>
-                            </td>
-                            <td class="p-3 text-center">
-                                <span class="text-green-400 font-semibold">19</span>
-                            </td>
-                            <td class="p-3">
-                                <button class="text-blue-400 hover:text-blue-300 mr-2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="text-yellow-400 hover:text-yellow-300">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="flex justify-between items-center mt-6">
-                <div class="flex space-x-6">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                        <span class="text-sm">Critical Risk (8.0+)</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                        <span class="text-sm">Medium Risk (4.0-7.9)</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span class="text-sm">Low Risk (0-3.9)</span>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-2 text-sm text-gray-400">
-                    <span>Showing 6 of 1,847 identities</span>
-                    <button class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Load More
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 2: Heatmap - Resource Access Distribution -->
-        <section class="glass-card rounded-xl p-6">
-            <h2 class="text-2xl font-bold text-red-400 mb-6">
-                <i class="fas fa-fire mr-3"></i>Resource Access Distribution Heatmap
-            </h2>
-            
-            <div class="grid grid-cols-8 gap-1">
-                <!-- Y-axis labels -->
-                <div class="text-right pr-2 py-2 text-sm">VM (50+)</div>
-                <div class="heatmap-cell bg-red-500 h-8 rounded" data-tooltip="VM - Engineering: 67 users"></div>
-                <div class="heatmap-cell bg-yellow-500 h-8 rounded" data-tooltip="VM - Marketing: 23 users"></div>
-                <div class="heatmap-cell bg-red-600 h-8 rounded" data-tooltip="VM - Finance: 45 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="VM - HR: 12 users"></div>
-                <div class="heatmap-cell bg-yellow-600 h-8 rounded" data-tooltip="VM - Operations: 34 users"></div>
-                <div class="heatmap-cell bg-red-400 h-8 rounded" data-tooltip="VM - DevOps: 56 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="VM - Legal: 8 users"></div>
-                
-                <div class="text-right pr-2 py-2 text-sm">Storage (30+)</div>
-                <div class="heatmap-cell bg-yellow-500 h-8 rounded" data-tooltip="Storage - Engineering: 34 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="Storage - Marketing: 15 users"></div>
-                <div class="heatmap-cell bg-red-500 h-8 rounded" data-tooltip="Storage - Finance: 78 users"></div>
-                <div class="heatmap-cell bg-yellow-600 h-8 rounded" data-tooltip="Storage - HR: 28 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="Storage - Operations: 19 users"></div>
-                <div class="heatmap-cell bg-yellow-400 h-8 rounded" data-tooltip="Storage - DevOps: 42 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="Storage - Legal: 11 users"></div>
-                
-                <div class="text-right pr-2 py-2 text-sm">Database (20+)</div>
-                <div class="heatmap-cell bg-red-600 h-8 rounded" data-tooltip="Database - Engineering: 89 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="Database - Marketing: 7 users"></div>
-                <div class="heatmap-cell bg-yellow-500 h-8 rounded" data-tooltip="Database - Finance: 31 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="Database - HR: 5 users"></div>
-                <div class="heatmap-cell bg-yellow-600 h-8 rounded" data-tooltip="Database - Operations: 24 users"></div>
-                <div class="heatmap-cell bg-red-500 h-8 rounded" data-tooltip="Database - DevOps: 67 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="Database - Legal: 3 users"></div>
-                
-                <div class="text-right pr-2 py-2 text-sm">Network (10+)</div>
-                <div class="heatmap-cell bg-yellow-500 h-8 rounded" data-tooltip="Network - Engineering: 23 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="Network - Marketing: 4 users"></div>
-                <div class="heatmap-cell bg-green-500 h-8 rounded" data-tooltip="Network - Finance: 9 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="Network - HR: 2 users"></div>
-                <div class="heatmap-cell bg-red-500 h-8 rounded" data-tooltip="Network - Operations: 56 users"></div>
-                <div class="heatmap-cell bg-yellow-600 h-8 rounded" data-tooltip="Network - DevOps: 34 users"></div>
-                <div class="heatmap-cell bg-green-600 h-8 rounded" data-tooltip="Network - Legal: 1 user"></div>
-                
-                <!-- X-axis labels -->
-                <div></div>
-                <div class="text-center text-sm py-2">Engineering</div>
-                <div class="text-center text-sm py-2">Marketing</div>
-                <div class="text-center text-sm py-2">Finance</div>
-                <div class="text-center text-sm py-2">HR</div>
-                <div class="text-center text-sm py-2">Operations</div>
-                <div class="text-center text-sm py-2">DevOps</div>
-                <div class="text-center text-sm py-2">Legal</div>
-            </div>
-            
-            <div class="flex justify-center mt-6 space-x-6">
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
-                    <span class="text-sm">High Density (50+ users)</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
-                    <span class="text-sm">Medium Density (20-49 users)</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
-                    <span class="text-sm">Low Density (1-19 users)</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 3: Attack Path Visualization -->
-        <section class="glass-card rounded-xl p-6">
-            <h2 class="text-2xl font-bold text-orange-400 mb-6">
-                <i class="fas fa-route mr-3"></i>Attack Path Visualization
-            </h2>
-            
-            <div class="relative h-96 bg-gray-800 rounded-lg p-4 overflow-hidden">
-                <svg width="100%" height="100%" class="absolute inset-0">
-                    <!-- Attack paths (edges) -->
-                    <line x1="100" y1="100" x2="300" y2="150" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5" opacity="0.8"/>
-                    <line x1="300" y1="150" x2="500" y2="100" stroke="#f59e0b" stroke-width="2" opacity="0.6"/>
-                    <line x1="100" y1="200" x2="300" y2="250" stroke="#10b981" stroke-width="2" opacity="0.6"/>
-                    <line x1="300" y1="250" x2="500" y2="200" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5" opacity="0.8"/>
-                    <line x1="500" y1="100" x2="700" y2="150" stroke="#f59e0b" stroke-width="2" opacity="0.6"/>
-                    <line x1="500" y1="200" x2="700" y2="250" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5" opacity="0.8"/>
-                </svg>
-                
-                <!-- Identity nodes -->
-                <div class="attack-node absolute top-16 left-16 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-xs font-bold" data-tooltip="User: john.doe@company.com">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="attack-node absolute top-32 left-16 w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-xs font-bold" data-tooltip="Service Account: api-service">
-                    <i class="fas fa-cog"></i>
-                </div>
-                
-                <!-- Resource nodes -->
-                <div class="attack-node absolute top-20 left-64 w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold" data-tooltip="EC2 Instance: web-server-01">
-                    <i class="fas fa-server"></i>
-                </div>
-                <div class="attack-node absolute top-40 left-64 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold" data-tooltip="S3 Bucket: company-data">
-                    <i class="fas fa-database"></i>
-                </div>
-                
-                <!-- Target resources -->
-                <div class="attack-node absolute top-16 left-96 w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold border-4 border-red-300" data-tooltip="Critical: Admin Console">
-                    <i class="fas fa-crown"></i>
-                </div>
-                <div class="attack-node absolute top-32 left-96 w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold" data-tooltip="RDS Database: prod-db">
-                    <i class="fas fa-database"></i>
-                </div>
-                
-                <!-- Final targets -->
-                <div class="attack-node absolute top-20 left-[28rem] w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-xs font-bold border-4 border-red-400" data-tooltip="CRITICAL: Root Access">
-                    <i class="fas fa-skull-crossbones"></i>
-                </div>
-                <div class="attack-node absolute top-40 left-[28rem] w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold border-4 border-red-300" data-tooltip="Sensitive Data Access">
-                    <i class="fas fa-lock-open"></i>
-                </div>
-            </div>
-            
-            <div class="flex justify-center mt-4 space-x-6">
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Critical Risk Path</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Medium Risk Path</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
-                    <span class="text-sm">Low Risk Path</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section 4: Permission Creep Index -->
-        <section class="glass-card rounded-xl p-6">
-            <h2 class="text-2xl font-bold text-purple-400 mb-6">
-                <i class="fas fa-chart-line mr-3"></i>Permission Creep Index
-            </h2>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Gauge Chart -->
-                <div class="text-center">
-                    <div class="gauge-container">
-                        <canvas id="gaugeChart" width="200" height="200"></canvas>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-orange-400">7.2</div>
-                                <div class="text-sm text-gray-400">Risk Score</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-sm text-gray-400">Organization Average</div>
-                </div>
-                
-                <!-- Trend Chart -->
-                <div>
-                    <canvas id="trendChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-            
-            <!-- Business Unit Breakdown -->
-            <div class="mt-8">
-                <h3 class="text-lg font-semibold mb-4">Permission Creep by Business Unit</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm">Engineering</span>
-                            <span class="text-red-400 font-bold">8.5</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                            <div class="bg-red-400 h-2 rounded-full" style="width: 85%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm">Marketing</span>
-                            <span class="text-yellow-400 font-bold">6.2</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                            <div class="bg-yellow-400 h-2 rounded-full" style="width: 62%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm">Finance</span>
-                            <span class="text-green-400 font-bold">4.1</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                            <div class="bg-green-400 h-2 rounded-full" style="width: 41%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <div class="container mx-auto px-6 space-y-8">
+    <!-- Cloud Selection Dropdown -->
+    <div class="mb-6">
+      <label for="cloudSelect" class="block mb-2 font-semibold">Select Cloud Provider:</label>
+      <select id="cloudSelect" onchange="filterDashboard(this.value)" class="p-3 rounded-md border border-orange-300 w-64 text-orange-700">
+        <option value="All">All</option>
+        <option value="AWS">AWS</option>
+        <option value="Azure">Azure</option>
+        <option value="GCP">GCP</option>
+        <option value="Other">Other</option>
+      </select>
     </div>
 
-    <!-- Tooltip -->
-    <div id="tooltip" class="tooltip"></div>
+    <!-- Compliance Summary Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <div class="glass-card neon-border p-6 text-center">
+        <div class="text-2xl font-bold">247</div>
+        <div class="text-sm">Overprivileged Identities</div>
+      </div>
+      <div class="glass-card neon-border p-6 text-center">
+        <div class="text-2xl font-bold">89</div>
+        <div class="text-sm">Orphaned Accounts</div>
+      </div>
+      <div class="glass-card neon-border p-6 text-center">
+        <div class="text-2xl font-bold">1,847</div>
+        <div class="text-sm">Total Cloud Identities</div>
+      </div>
+      <div class="glass-card neon-border p-6 text-center">
+        <div class="text-2xl font-bold">156/203</div>
+        <div class="text-sm">Access Reviews</div>
+      </div>
+      <div class="glass-card neon-border p-6 text-center">
+        <div class="text-2xl font-bold">42</div>
+        <div class="text-sm">Auto Deprovisioning</div>
+      </div>
+    </section>
 
-    <script>
-        // Tooltip functionality
-        const tooltip = document.getElementById('tooltip');
-        const tooltipElements = document.querySelectorAll('[data-tooltip]');
-        
-        tooltipElements.forEach(element => {
-            element.addEventListener('mouseenter', (e) => {
-                tooltip.textContent = e.target.getAttribute('data-tooltip');
-                tooltip.style.opacity = '1';
-            });
-            
-            element.addEventListener('mousemove', (e) => {
-                tooltip.style.left = e.pageX + 10 + 'px';
-                tooltip.style.top = e.pageY + 10 + 'px';
-            });
-            
-            element.addEventListener('mouseleave', () => {
-                tooltip.style.opacity = '0';
-            });
-        });
+    <!-- Risk Score Pie Chart -->
+    <section class="glass-card p-6">
+      <h2 class="section-title">Risk Score Distribution</h2>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <div class="w-full lg:w-1/2">
+          <canvas id="riskPieChart"></canvas>
+        </div>
+        <div class="w-full lg:w-1/2">
+          <ul class="space-y-3 text-sm">
+            <li><span class="font-bold text-red-600">Critical (8.0+)</span>: 52 identities</li>
+            <li><span class="font-bold text-yellow-600">High (6.0 - 7.9)</span>: 113 identities</li>
+            <li><span class="font-bold text-orange-500">Medium (4.0 - 5.9)</span>: 298 identities</li>
+            <li><span class="font-bold text-green-600">Low (0 - 3.9)</span>: 1,384 identities</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-        // Permission matrix click functionality
-        document.querySelectorAll('.permission-matrix-cell').forEach(cell => {
-            cell.addEventListener('click', () => {
-                alert('Drill-down: ' + cell.getAttribute('data-tooltip'));
-            });
-        });
+    <!-- Top Risk Identities Chart -->
+    <section class="glass-card p-6">
+      <h2 class="section-title">Top Risk Identities</h2>
+      <canvas id="topRiskBarChart"></canvas>
+    </section>
 
-        // Heatmap click functionality
-        document.querySelectorAll('.heatmap-cell').forEach(cell => {
-            cell.addEventListener('click', () => {
-                alert('Resource Details: ' + cell.getAttribute('data-tooltip'));
-            });
-        });
+    <!-- Resource Distribution by Cloud -->
+    <section class="glass-card p-6">
+      <h2 class="section-title">Resource Distribution Across Clouds</h2>
+      <canvas id="cloudResourceChart"></canvas>
+    </section>
+  </div>
 
-        // Attack node click functionality
-        document.querySelectorAll('.attack-node').forEach(node => {
-            node.addEventListener('click', () => {
-                alert('Entity Details: ' + node.getAttribute('data-tooltip'));
-            });
-        });
+  <script>
+    function filterDashboard(provider) {
+      alert("Now showing data for: " + provider);
+    }
 
-        // Gauge Chart
-        const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
-        new Chart(gaugeCtx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [7.2, 2.8],
-                    backgroundColor: ['#f59e0b', '#374151'],
-                    borderWidth: 0,
-                    cutout: '70%'
-                }]
-            },
-            options: {
-                responsive: false,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                rotation: -90,
-                circumference: 180
-            }
-        });
+    const pieCtx = document.getElementById("riskPieChart").getContext("2d");
+    new Chart(pieCtx, {
+      type: "pie",
+      data: {
+        labels: ["Critical", "High", "Medium", "Low"],
+        datasets: [{
+          data: [52, 113, 298, 1384],
+          backgroundColor: ["#dc2626", "#facc15", "#fb923c", "#16a34a"],
+        }],
+      },
+      options: { plugins: { legend: { position: "bottom" } } },
+    });
 
-        // Trend Chart
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Permission Creep Score',
-                    data: [6.8, 7.1, 7.5, 7.8, 7.4, 7.2],
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        grid: {
-                            color: '#374151'
-                        },
-                        ticks: {
-                            color: '#9ca3af'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: '#374151'
-                        },
-                        ticks: {
-                            color: '#9ca3af'
-                        }
-                    }
-                }
-            }
-        });
+    const barCtx = document.getElementById("topRiskBarChart").getContext("2d");
+    new Chart(barCtx, {
+      type: "bar",
+      data: {
+        labels: ["john.doe@company.com", "admin@company.com", "svc-prod-db", "svc-finance", "alice@company.com"],
+        datasets: [{
+          label: "Risk Score",
+          data: [8.5, 9.8, 7.6, 6.3, 8.1],
+          backgroundColor: "#ea580c",
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        scales: { x: { beginAtZero: true, max: 10 } },
+        plugins: { legend: { display: false } },
+      },
+    });
 
-        // Filter change handlers
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', () => {
-                console.log('Filter changed:', select.value);
-                // In a real application, this would trigger data refresh
-            });
-        });
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96090deef02d7ef7',t:'MTc1Mjc0ODEyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    const cloudCtx = document.getElementById("cloudResourceChart").getContext("2d");
+    new Chart(cloudCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["AWS", "Azure", "GCP", "Other"],
+        datasets: [{
+          data: [320, 240, 190, 70],
+          backgroundColor: ["#f97316", "#facc15", "#60a5fa", "#a855f7"],
+          hoverOffset: 20,
+        }],
+      },
+      options: {
+        cutout: "65%",
+        plugins: { legend: { position: "bottom" } },
+      },
+    });
+  </script>
+</body>
 </html>
